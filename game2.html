@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css"
+    />
+    <title>Piggy</title>
+    <style>
+      .start {
+      }
+      .board {
+        background-image: url(grass_plan.jpeg);
+        background-size: cover;
+
+        background-repeat: no-repeat;
+        position: relative;
+      }
+      .piggy {
+        width: 60px;
+        height: 60px;
+        position: absolute;
+        font-size: 60px;
+        top: 10px;
+        left: 10px;
+        display: flex;
+        align-items: center;
+      }
+      .tomato {
+        width: 60px;
+        height: 60px;
+        position: absolute;
+        top: 30px;
+        left: 100px;
+        font-size: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .buttons {
+        display: flex;
+        justify-content: center;
+        width: 300px;
+        margin: 0;
+      }
+      .header {
+        display: flex;
+        justify-content: space-between;
+        width: 400px;
+        font-weight: 800;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="start" class="start"></div>
+    <audio id="bgmusic" loop>
+      <source
+        src="cotton-toys-soundroll-main-version-16753-01-17.mp3"
+        type="audio/mpeg"
+      />
+    </audio>
+    <div class="header">
+      <div class="score" id="score">Score:</div>
+      <div class="timer" id="timer"></div>
+    </div>
+    <div id="board" class="board">
+      <div id="hero" class="piggy">🐖</div>
+      <div id="tomato" class="tomato">🍅</div>
+    </div>
+
+    <div class="buttons">
+      <button class="button is-danger is-outlined" onclick="changeDir('Up')">
+        Up
+      </button>
+      <button class="button is-success is-outlined" onclick="changeDir('Down')">
+        Down
+      </button>
+      <button class="button is-danger is-outlined" onclick="changeDir('Left')">
+        Left
+      </button>
+      <button
+        class="button is-success is-outlined"
+        onclick="changeDir('Right')"
+      >
+        Right
+      </button>
+    </div>
+
+    <script>
+      const start = document.getElementById("start");
+      const oink = new Audio("apple-bite-joshua-chivers-1-00-00.mp3");
+      const bg_music = new Audio(
+        "cotton-toys-soundroll-main-version-16753-01-17.mp3",
+      );
+      let direction = "down";
+      const hero = document.getElementById("hero");
+      let heroX = 0;
+      let heroY = 0;
+      let tomatoX = getRandomInt(50) * 10;
+      let tomatoY = getRandomInt(25) * 10;
+      let score = 0;
+      let timer = 60;
+      const timerEl = document.getElementById("timer");
+      setInterval(function () {
+        timer--;
+        timerEl.textContent = "Time: " + timer;
+        if (timer == 0) {
+          timer = 60;
+          score = 0;
+          alert("Time's up!");
+        }
+      }, 1000);
+      const board = document.getElementById("board");
+      const boardHeight = 300;
+      const boardWidth = 560;
+      board.style.width = `${boardWidth}px`;
+      board.style.height = `${boardHeight}px`;
+      const tomato = document.getElementById("tomato");
+      function Up() {
+        heroY = heroY - 10;
+        if (heroY < 0) {
+          heroY = boardHeight - 60;
+        }
+        draw();
+        bg_music.play();
+      }
+      function Right() {
+        heroX = heroX + 10;
+        let angle = 0;
+        if (heroX > boardWidth - 60) {
+          heroX = 0;
+        }
+        draw();
+        bg_music.play();
+      }
+      function Left() {
+        heroX = heroX - 10;
+        if (heroX < 0) {
+          heroX = boardWidth - 60;
+        }
+        draw();
+        bg_music.play();
+      }
+      function Down() {
+        heroY = heroY + 10;
+
+        if (heroY > boardHeight - 60) {
+          heroY = 0;
+        }
+        draw();
+        bg_music.play();
+      }
+
+      function draw() {
+        hero.style.top = `${heroY}px`;
+        hero.style.left = `${heroX}px`;
+        tomato.style.top = `${tomatoY}px`;
+        tomato.style.left = `${tomatoX}px`;
+
+        console.log({ heroX, heroY, tomatoX, tomatoY });
+        if (heroX === tomatoX && heroY === tomatoY) {
+          score++;
+          document.getElementById("score").textContent = `Score: ${score}🥫`;
+          tomatoX = getRandomInt(50) * 10;
+          tomatoY = getRandomInt(25) * 10;
+          draw();
+          oink.play();
+        }
+      }
+
+      function getRandomInt(max) {
+        return Math.floor(Math.random() * max);
+      }
+      document.addEventListener("keydown", function (event) {
+        if (event.code == "ArrowUp") {
+          changeDir("Up");
+          hero.style.transform = "rotate(90deg)";
+        } else if (event.code == "ArrowDown") {
+          changeDir("Down");
+          hero.style.transform = "rotate(-90deg)";
+        } else if (event.code == "ArrowLeft") {
+          changeDir("Left");
+          hero.style.transform = "rotateY(0)";
+        } else if (event.code == "ArrowRight") {
+          changeDir("Right");
+          hero.style.transform = "rotateY(3.142rad)";
+        }
+      });
+      function gameLoop() {
+        if (direction === "Up") {
+          Up();
+        } else if (direction === "Down") {
+          Down();
+        } else if (direction === "Left") {
+          Left();
+        } else if (direction === "Right") {
+          Right();
+        }
+      }
+
+      setInterval(gameLoop, 200);
+      function changeDir(newDir) {
+        direction = newDir;
+      }
+    </script>
+  </body>
+</html>
